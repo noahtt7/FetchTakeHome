@@ -23,6 +23,9 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,12 +54,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void fetchData() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "https://fetch-hiring.s3.amazonaws.com/mobile.html";
+        String url = "https://fetch-hiring.s3.amazonaws.com/hiring.json";
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //parseHtmlToJson(response);
                         parseJson(response);
 //                        Toast.makeText(getApplicationContext(), "Response: " + response, Toast.LENGTH_SHORT).show();
                     }
@@ -70,14 +74,45 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+    public void parseHtmlToJson(String html) {
+        Document doc = Jsoup.parse(html);
+
+        Element scriptTag = doc.selectFirst("script");
+
+        if (scriptTag != null) {
+            // Get JSON string from script tag
+            String jsonData = scriptTag.html();
+
+            try {
+                JSONObject jsonObject = new JSONObject(jsonData);
+                textView.append("test");
+
+                JSONArray jsonArray = jsonObject.getJSONArray("");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    int id, listId;
+                    String name;
+                    JSONObject jsonObject2 = jsonArray.getJSONObject(i);
+                    id = jsonObject2.getInt("id");
+                    listId = jsonObject2.getInt("listId");
+                    name = jsonObject2.getString("name");
+
+                    textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void parseJson(String response) {
         try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("items");
+            JSONArray jsonArray = new JSONArray(response);
+            //JSONArray jsonArray = jsonObject.getJSONArray("items");
             for (int i = 0; i < jsonArray.length(); i++) {
                 int id, listId;
                 String name;
                 JSONObject jsonObject2 = jsonArray.getJSONObject(i);
+
                 id = jsonObject2.getInt("id");
                 listId = jsonObject2.getInt("listId");
                 name = jsonObject2.getString("name");
