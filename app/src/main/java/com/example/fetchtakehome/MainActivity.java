@@ -27,6 +27,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     TextView textView;
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         textView = findViewById(R.id.results);
+        textView.setText("");
         button = findViewById(R.id.buttonFetch);
         button.setOnClickListener( new View.OnClickListener() {
 
@@ -74,50 +80,84 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    public void parseHtmlToJson(String html) {
-        Document doc = Jsoup.parse(html);
-
-        Element scriptTag = doc.selectFirst("script");
-
-        if (scriptTag != null) {
-            // Get JSON string from script tag
-            String jsonData = scriptTag.html();
-
-            try {
-                JSONObject jsonObject = new JSONObject(jsonData);
-                textView.append("test");
-
-                JSONArray jsonArray = jsonObject.getJSONArray("");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    int id, listId;
-                    String name;
-                    JSONObject jsonObject2 = jsonArray.getJSONObject(i);
-                    id = jsonObject2.getInt("id");
-                    listId = jsonObject2.getInt("listId");
-                    name = jsonObject2.getString("name");
-
-                    textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void parseHtmlToJson(String html) {
+//        Document doc = Jsoup.parse(html);
+//
+//        Element scriptTag = doc.selectFirst("script");
+//
+//        if (scriptTag != null) {
+//            // Get JSON string from script tag
+//            String jsonData = scriptTag.html();
+//
+//            try {
+//                JSONObject jsonObject = new JSONObject(jsonData);
+//                textView.append("test");
+//
+//                JSONArray jsonArray = jsonObject.getJSONArray("");
+//
+//                for (int i = 0; i < jsonArray.length(); i++) {
+//                    int id, listId;
+//                    String name;
+//                    JSONObject jsonObject2 = jsonArray.getJSONObject(i);
+//                    id = jsonObject2.getInt("id");
+//                    listId = jsonObject2.getInt("listId");
+//                    name = jsonObject2.getString("name");
+//
+//                    //textView.append("forsen");
+//                    if (name != "null") {
+//                        //textView.append("forsen");
+//                        //textView.setText("id: " + id + " listId: " + listId + " name: " + name + "\n");
+//                    }
+//                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     public void parseJson(String response) {
         try {
             JSONArray jsonArray = new JSONArray(response);
             //JSONArray jsonArray = jsonObject.getJSONArray("items");
+            List list = new ArrayList();
             for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject item = jsonArray.getJSONObject(i);
+                String name = item.getString("name");
+
+                if (name != null && name != "")
+                    list.add(jsonArray.getJSONObject(i));
+            }
+            Collections.sort(list, new Comparator<JSONObject>() {
+                private static final String KEY_NAME = "id";
+                //@Override
+                public int compare(JSONObject a, JSONObject b) {
+                    Integer id1 = new Integer(0);
+                    Integer id2 = new Integer(0);
+                    try {
+                        id1 = a.getInt(KEY_NAME);
+                        id2 = b.getInt(KEY_NAME);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return id1.compareTo(id2);
+                }
+            });
+            JSONArray sortedArr = new JSONArray();
+            for (int i = 0; i < list.size(); i++) {
+                sortedArr.put(list.get(i));
+            }
+
+            for (int i = 0; i < sortedArr.length(); i++) {
                 int id, listId;
                 String name;
-                JSONObject jsonObject2 = jsonArray.getJSONObject(i);
+                JSONObject jsonObject2 = sortedArr.getJSONObject(i);
 
                 id = jsonObject2.getInt("id");
                 listId = jsonObject2.getInt("listId");
                 name = jsonObject2.getString("name");
 
-                textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
+                if (!name.equals("null") && !name.isEmpty())
+                    textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
             }
         } catch (JSONException e) {
             throw new RuntimeException(e);
