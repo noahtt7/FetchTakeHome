@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.volley)
     implementation(libs.jsoup)
+    implementation(libs.recyclerView)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

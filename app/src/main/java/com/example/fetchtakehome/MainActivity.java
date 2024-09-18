@@ -142,6 +142,23 @@ public class MainActivity extends AppCompatActivity {
                     return id1.compareTo(id2);
                 }
             });
+
+//            Collections.sort(list, new Comparator<JSONObject>() {
+//                private static final String KEY_NAME = "name";
+//
+//                public int compare(JSONObject a, JSONObject b) {
+//                    String id1 = new String();
+//                    String id2 = new String();
+//                    try {
+//                        id1 = a.getString(KEY_NAME);
+//                        id2 = b.getString(KEY_NAME);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                    return id1.compareTo(id2);
+//                }
+//            });
+
             JSONArray sortedArr = new JSONArray();
             for (int i = 0; i < list.size(); i++) {
                 sortedArr.put(list.get(i));
