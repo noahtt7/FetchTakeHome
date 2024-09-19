@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,8 +36,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    TextView textView;
+    RecyclerView recyclerView;
+    List<Model> modelList;
+    CustomAdapter customAdapter;
+    TextView labelText;
     Button button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +51,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        textView = findViewById(R.id.results);
-        textView.setText("");
+        labelText = findViewById(R.id.labelText);
+        //labelText.setText("ID");
+        modelList = new ArrayList<>();
         button = findViewById(R.id.buttonFetch);
         button.setOnClickListener( new View.OnClickListener() {
 
@@ -56,6 +62,21 @@ public class MainActivity extends AppCompatActivity {
                 fetchData();
             }
         });
+
+        //displayItems();
+    }
+
+    private void displayItems() {
+        recyclerView = findViewById(R.id.recycler_main);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+//        modelList = new ArrayList<>();
+//        modelList.add(new Model(2, "forsen"));
+        customAdapter = new CustomAdapter(this, modelList);
+        recyclerView.setAdapter(customAdapter);
+
     }
 
     public void fetchData() {
@@ -68,52 +89,17 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         //parseHtmlToJson(response);
                         parseJson(response);
-//                        Toast.makeText(getApplicationContext(), "Response: " + response, Toast.LENGTH_SHORT).show();
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        textView.setText("Error fetching URL.");
+                        //textView.setText("Error fetching URL.");
+                        System.out.println("Error fetching URL");
                     }
         });
 
         queue.add(stringRequest);
     }
-
-//    public void parseHtmlToJson(String html) {
-//        Document doc = Jsoup.parse(html);
-//
-//        Element scriptTag = doc.selectFirst("script");
-//
-//        if (scriptTag != null) {
-//            // Get JSON string from script tag
-//            String jsonData = scriptTag.html();
-//
-//            try {
-//                JSONObject jsonObject = new JSONObject(jsonData);
-//                textView.append("test");
-//
-//                JSONArray jsonArray = jsonObject.getJSONArray("");
-//
-//                for (int i = 0; i < jsonArray.length(); i++) {
-//                    int id, listId;
-//                    String name;
-//                    JSONObject jsonObject2 = jsonArray.getJSONObject(i);
-//                    id = jsonObject2.getInt("id");
-//                    listId = jsonObject2.getInt("listId");
-//                    name = jsonObject2.getString("name");
-//
-//                    //textView.append("forsen");
-//                    if (name != "null") {
-//                        //textView.append("forsen");
-//                        //textView.setText("id: " + id + " listId: " + listId + " name: " + name + "\n");
-//                    }
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     public void parseJson(String response) {
         try {
@@ -174,8 +160,11 @@ public class MainActivity extends AppCompatActivity {
                 name = jsonObject2.getString("name");
 
                 if (!name.equals("null") && !name.isEmpty())
-                    textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
+                    modelList.add(new Model(id, listId, name));
+                    //textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
             }
+            labelText.setText("ID");
+            displayItems();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
