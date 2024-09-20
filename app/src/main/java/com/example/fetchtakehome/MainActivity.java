@@ -39,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     List<Model> modelList;
     CustomAdapter customAdapter;
-    TextView labelText;
+    TextView labelId;
+    TextView labelListId;
+    TextView labelName;
     Button button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,10 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        labelText = findViewById(R.id.labelText);
+        labelId = findViewById(R.id.labelText);
+        labelListId = findViewById(R.id.idLabelText);
+        labelName = findViewById(R.id.nameLabelText);
+
         //labelText.setText("ID");
         modelList = new ArrayList<>();
         button = findViewById(R.id.buttonFetch);
@@ -163,7 +168,9 @@ public class MainActivity extends AppCompatActivity {
                     modelList.add(new Model(id, listId, name));
                     //textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
             }
-            labelText.setText("ID");
+            labelId.setText("ID");
+            labelListId.setText("List ID");
+            labelName.setText("Name");
             displayItems();
         } catch (JSONException e) {
             throw new RuntimeException(e);

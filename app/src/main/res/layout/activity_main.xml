@@ -9,42 +9,47 @@
     tools:context=".MainActivity">
 
     <LinearLayout
-        android:layout_width="411dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/idLabelText"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:minWidth="110dp"
+            android:padding="8dp"
             android:text=""
             android:textSize="24sp" />
 
         <TextView
             android:id="@+id/labelText"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text=""
+            android:textAlignment="center"
             android:textSize="24sp"
-            android:minWidth="110dp"/>
+            android:minWidth="110dp"
+            android:padding="8dp"/>
 
         <TextView
             android:id="@+id/nameLabelText"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:minWidth="110dp"
             android:text=""
             android:textSize="24sp"
-            android:gravity="end"/>
+            android:gravity="end"
+            android:padding="8dp"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_main"
         android:layout_width="match_parent"
-        android:layout_height="608dp"
+        android:layout_height="550dp"
         android:layout_margin="8dp" />
 
 <!--    <androidx.recyclerview.widget.RecyclerView-->
@@ -55,9 +60,11 @@
 
     <Button
         android:id="@+id/buttonFetch"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="#FF009688"
         android:text="Fetch Data"
-        android:layout_gravity="center" />
+        android:textColor="#FFFFFF" />
 
 </LinearLayout>
