@@ -1,8 +1,8 @@
 package com.example.fetchtakehome;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,7 +13,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
@@ -26,9 +25,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         labelListId = findViewById(R.id.idLabelText);
         labelName = findViewById(R.id.nameLabelText);
 
-        //labelText.setText("ID");
         modelList = new ArrayList<>();
         button = findViewById(R.id.buttonFetch);
         button.setOnClickListener( new View.OnClickListener() {
@@ -67,23 +62,23 @@ public class MainActivity extends AppCompatActivity {
                 fetchData();
             }
         });
-
-        //displayItems();
     }
 
+    /**
+     * Sets up and displays the items in the RecyclerView
+     */
     private void displayItems() {
         recyclerView = findViewById(R.id.recycler_main);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-//        modelList = new ArrayList<>();
-//        modelList.add(new Model(2, "forsen"));
         customAdapter = new CustomAdapter(this, modelList);
         recyclerView.setAdapter(customAdapter);
-
     }
 
+    /**
+     * Receives JSON data. Parses the JSON if successful.
+     */
     public void fetchData() {
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "https://fetch-hiring.s3.amazonaws.com/hiring.json";
@@ -100,57 +95,33 @@ public class MainActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         //textView.setText("Error fetching URL.");
                         System.out.println("Error fetching URL");
+                        Log.e("VolleyError: ", error.toString());
+                        Toast.makeText(getApplicationContext(), "Failed to fetch data.", Toast.LENGTH_LONG).show();
                     }
         });
-
         queue.add(stringRequest);
     }
 
+    /**
+     * Parses JSON data, extracts all valid items
+     * and displays the items on the app.
+     */
     public void parseJson(String response) {
         try {
             JSONArray jsonArray = new JSONArray(response);
-            //JSONArray jsonArray = jsonObject.getJSONArray("items");
-            List list = new ArrayList();
+
+            List<JSONObject> list = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject item = jsonArray.getJSONObject(i);
                 String name = item.getString("name");
 
-                if (name != null && name != "")
+                if (!name.isEmpty())
                     list.add(jsonArray.getJSONObject(i));
             }
-            Collections.sort(list, new Comparator<JSONObject>() {
-                private static final String KEY_NAME = "id";
-                //@Override
-                public int compare(JSONObject a, JSONObject b) {
-                    Integer id1 = new Integer(0);
-                    Integer id2 = new Integer(0);
-                    try {
-                        id1 = a.getInt(KEY_NAME);
-                        id2 = b.getInt(KEY_NAME);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    return id1.compareTo(id2);
-                }
-            });
 
-//            Collections.sort(list, new Comparator<JSONObject>() {
-//                private static final String KEY_NAME = "name";
-//
-//                public int compare(JSONObject a, JSONObject b) {
-//                    String id1 = new String();
-//                    String id2 = new String();
-//                    try {
-//                        id1 = a.getString(KEY_NAME);
-//                        id2 = b.getString(KEY_NAME);
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return id1.compareTo(id2);
-//                }
-//            });
-
+            sortById(list);
             JSONArray sortedArr = new JSONArray();
+
             for (int i = 0; i < list.size(); i++) {
                 sortedArr.put(list.get(i));
             }
@@ -166,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
                 if (!name.equals("null") && !name.isEmpty())
                     modelList.add(new Model(id, listId, name));
-                    //textView.append("id: " + id + " listId: " + listId + " name: " + name + "\n");
             }
             labelId.setText("ID");
             labelListId.setText("List ID");
@@ -175,5 +145,26 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Sorts each item by their ID.
+     */
+    private void sortById(List<JSONObject> list) {
+        Collections.sort(list, new Comparator<JSONObject>() {
+            private static final String KEY_NAME = "id";
+            @Override
+            public int compare(JSONObject a, JSONObject b) {
+                Integer id1 = new Integer(0);
+                Integer id2 = new Integer(0);
+                try {
+                    id1 = a.getInt(KEY_NAME);
+                    id2 = b.getInt(KEY_NAME);
+                } catch (JSONException e) {
+                    Log.e("TAG","An error occured: ", e);
+                }
+                return id1.compareTo(id2);
+            }
+        });
     }
 }

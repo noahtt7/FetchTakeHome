@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomViewHolder> {
-    private Context context;
-    private List<Model> listItems;
+    private final Context context;
+    private final List<Model> listItems;
 
     public CustomAdapter(Context context, List<Model> listItems) {
         this.context = context;

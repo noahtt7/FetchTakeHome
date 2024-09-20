@@ -52,12 +52,6 @@
         android:layout_height="550dp"
         android:layout_margin="8dp" />
 
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/recycler_main"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height=""-->
-<!--        tools:listitem="@layout/activity_main" />-->
-
     <Button
         android:id="@+id/buttonFetch"
         android:layout_width="300dp"

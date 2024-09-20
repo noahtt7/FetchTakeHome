@@ -1,9 +1,9 @@
 package com.example.fetchtakehome;
 
 public class Model {
-    Integer id = 0;
-    Integer listId = 0;
-    String name = "";
+    Integer id;
+    Integer listId;
+    String name;
 
     public Model(Integer id, Integer listId, String name) {
         this.id = id;
