@@ -32,13 +32,27 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    // RecyclerView for displaying items in the app
     RecyclerView recyclerView;
+
+    // List of items to be displayed in the RecyclerView
     List<Model> modelList;
+
+    // Adapter for the RecyclerView
     CustomAdapter customAdapter;
-    TextView labelId;
-    TextView labelListId;
-    TextView labelName;
+
+    // TextViews for displaying data attributes
+    TextView labelListId, labelName, labelId;
+
+    // Button to trigger data fetch
     Button button;
+
+    /**
+     * Initializes the activity, binds UI components, and sets up the
+     * button that allows for data fetching.
+     * @param savedInstanceState Saved state of app.
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,14 +63,15 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        labelId = findViewById(R.id.labelText);
         labelListId = findViewById(R.id.idLabelText);
         labelName = findViewById(R.id.nameLabelText);
+        labelId = findViewById(R.id.labelText);
 
         modelList = new ArrayList<>();
+
+        // Set up button to fetch data on click
         button = findViewById(R.id.buttonFetch);
         button.setOnClickListener( new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 fetchData();
@@ -65,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets up and displays the items in the RecyclerView
+     * Sets up the RecyclerView, binds the custom adapter, and displays the list of items.
      */
     private void displayItems() {
         recyclerView = findViewById(R.id.recycler_main);
@@ -104,13 +119,15 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Parses JSON data, extracts all valid items
-     * and displays the items on the app.
+     * and displays the items on the app by list ID, name, and ID.
+     * @param response raw JSON response.
      */
     public void parseJson(String response) {
         try {
             JSONArray jsonArray = new JSONArray(response);
-
             List<JSONObject> list = new ArrayList<>();
+
+            // Iterate through the JSONArray and filter out null or empty names
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject item = jsonArray.getJSONObject(i);
                 String name = item.getString("name");
@@ -119,13 +136,17 @@ public class MainActivity extends AppCompatActivity {
                     list.add(jsonArray.getJSONObject(i));
             }
 
-            sortById(list);
+            // Sort list by list ID
+            sortByListId(list);
             JSONArray sortedArr = new JSONArray();
 
+            // Add sorted items to new JSONArray
             for (int i = 0; i < list.size(); i++) {
                 sortedArr.put(list.get(i));
             }
 
+            // Iterate through the sorted array and extract fields
+            // to add to modelList
             for (int i = 0; i < sortedArr.length(); i++) {
                 int id, listId;
                 String name;
@@ -136,8 +157,10 @@ public class MainActivity extends AppCompatActivity {
                 name = jsonObject2.getString("name");
 
                 if (!name.equals("null") && !name.isEmpty())
-                    modelList.add(new Model(id, listId, name));
+                    modelList.add(new Model(listId, name, id));
             }
+
+            // Display labels and items in the app
             labelId.setText("ID");
             labelListId.setText("List ID");
             labelName.setText("Name");
@@ -148,11 +171,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Sorts each item by their ID.
+     * Sorts each item by their list ID.
+     * @param list List of items as JSONObjects.
      */
-    private void sortById(List<JSONObject> list) {
+    private void sortByListId(List<JSONObject> list) {
         Collections.sort(list, new Comparator<JSONObject>() {
-            private static final String KEY_NAME = "id";
+            private static final String KEY_NAME = "listId";
             @Override
             public int compare(JSONObject a, JSONObject b) {
                 Integer id1 = new Integer(0);
